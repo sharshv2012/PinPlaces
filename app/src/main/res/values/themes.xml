@@ -6,4 +6,14 @@
     </style>
 
     <style name="Theme.PinPlaces" parent="Base.Theme.PinPlaces" />
+    <style name="CustomNoActionBarTheme" parent = "@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor" >@color/teal_200</item>
+    </style>
+
+    <style name="CustomToolBarStyle">
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="colorControlNormal">#FFFFFF</item>
+    </style>
+
+
 </resources>

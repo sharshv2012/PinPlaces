@@ -16,8 +16,8 @@
             android:name=".AddHappyPlaceActivity"
             android:screenOrientation="portrait"
             android:label="Pin Your Place"
-            android:theme="@style/Theme.Design.NoActionBar"
-            android:exported="false" />
+            android:theme="@style/CustomNoActionBarTheme"
+             />
         <activity
             android:name=".MainActivity"
             android:exported="true">
