@@ -1,5 +1,6 @@
 package com.example.pinplaces
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.ActivityNotFoundException
@@ -7,10 +8,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.example.pinplaces.databinding.ActivityAddHappyPlaceBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,6 +22,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -108,6 +112,24 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
     }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK){
+            if(requestCode == GALLERY){
+                if (data != null){
+                    val contentURI = data.data
+                    try {
+                        val selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver ,contentURI)
+                        binding?.ivPlaceImage?.setImageBitmap(selectedImageBitmap)
+                    }catch (e : IOException){
+                        e.printStackTrace()
+                        Toast.makeText(this , "Something Went Wrong!" , Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
     private fun choosePhotoFromGallery(){
         Dexter.withContext(this@AddHappyPlaceActivity).withPermissions(
             android.Manifest.permission.READ_EXTERNAL_STORAGE ,
@@ -118,8 +140,9 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()){
-                    Toast.makeText(this@AddHappyPlaceActivity ,
-                        "Permissions granted" , Toast.LENGTH_SHORT).show()
+                    val galleryIntent = Intent(Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    startActivityForResult(galleryIntent , GALLERY)
                 }
             }
 
@@ -159,5 +182,9 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         val myFormat = "dd.MM.yyyy"
         val sdf = SimpleDateFormat(myFormat , Locale.getDefault())
         binding?.etDate!!.setText(sdf.format(cal.time).toString())
+    }
+
+    companion object{
+        private const val GALLERY = 1
     }
 }
