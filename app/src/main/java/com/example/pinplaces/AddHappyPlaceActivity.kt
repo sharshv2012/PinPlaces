@@ -14,6 +14,7 @@ import android.provider.Settings
 import android.view.View
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.example.pinplaces.databinding.ActivityAddHappyPlaceBinding
@@ -32,6 +33,10 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private var binding:ActivityAddHappyPlaceBinding? = null
     private var cal = Calendar.getInstance()
     private lateinit var dateSetListener: OnDateSetListener
+    private lateinit var imageCaptureLauncher: ActivityResultLauncher<Intent>
+    private lateinit var selectImageLauncher: ActivityResultLauncher<Intent>
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +56,27 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             cal.set(Calendar.DAY_OF_MONTH , dayOfMonth)
             updateDateInView()
         }
+
+        imageCaptureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val thumbNail: Bitmap = result.data?.extras?.get("data")as Bitmap
+                binding?.ivPlaceImage?.setImageBitmap(thumbNail)
+            }
+        }
+
+        selectImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val selectedImageUri = result.data?.data
+                try {
+                    val selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver ,selectedImageUri)
+                    binding?.ivPlaceImage?.setImageBitmap(selectedImageBitmap)
+                }catch (e : IOException){
+                    e.printStackTrace()
+                    Toast.makeText(this , "Something Went Wrong!" , Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         binding?.etDate?.setOnClickListener(this)
         binding?.tvAddImage?.setOnClickListener(this)
     }
@@ -113,27 +139,10 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK){            if(requestCode == GALLERY){
-            if (data != null){
 
-                    val contentURI = data.data
-                    try {
-                        val selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver ,contentURI)
-                        binding?.ivPlaceImage?.setImageBitmap(selectedImageBitmap)
-                    }catch (e : IOException){
-                        e.printStackTrace()
-                        Toast.makeText(this , "Something Went Wrong!" , Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }else if (requestCode == CAMERA){
-                val thumbnail : Bitmap = data!!.extras!!.get("data")as Bitmap
-                binding?.ivPlaceImage?.setImageBitmap(thumbnail)
-            }
-        }
-    }
     private fun takePhotoFromCamera(){
+
+
         Dexter.withContext(this@AddHappyPlaceActivity).withPermissions(
             android.Manifest.permission.READ_EXTERNAL_STORAGE ,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE ,
@@ -144,7 +153,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()){
                     val galleryIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(galleryIntent , CAMERA)
+                    imageCaptureLauncher.launch(galleryIntent)
                 }
             }
 
@@ -157,6 +166,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         }).onSameThread().check()
     }
     private fun choosePhotoFromGallery(){
+
         Dexter.withContext(this@AddHappyPlaceActivity).withPermissions(
             android.Manifest.permission.READ_EXTERNAL_STORAGE ,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE ,
@@ -168,7 +178,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 if (report!!.areAllPermissionsGranted()){
                     val galleryIntent = Intent(Intent.ACTION_PICK,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    startActivityForResult(galleryIntent , GALLERY)
+                        selectImageLauncher.launch(galleryIntent)
+
                 }
             }
 
@@ -210,8 +221,5 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         binding?.etDate!!.setText(sdf.format(cal.time).toString())
     }
 
-    companion object{
-        private const val GALLERY = 1
-        private const val CAMERA = 2
-    }
+
 }
