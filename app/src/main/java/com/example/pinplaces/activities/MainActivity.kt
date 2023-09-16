@@ -1,4 +1,4 @@
-package com.example.pinplaces
+package com.example.pinplaces.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

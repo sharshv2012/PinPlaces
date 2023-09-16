@@ -1,4 +1,4 @@
-package com.example.pinplaces
+package com.example.pinplaces.activities
 
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -42,7 +42,9 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var dateSetListener: OnDateSetListener
     private lateinit var imageCaptureLauncher: ActivityResultLauncher<Intent>
     private lateinit var selectImageLauncher: ActivityResultLauncher<Intent>
-
+    private var saveImageToInternalStorage : Uri? = null
+    private var mLatitude : Double = 0.0
+    private var mLongitude : Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +69,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         imageCaptureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val thumbNail: Bitmap = result.data?.extras?.get("data")as Bitmap
-                val saveImageToInternalStorage = saveImageToInternalStorage(thumbNail)
+                saveImageToInternalStorage = saveImageToInternalStorage(thumbNail)
                 Log.e("SavedImage" , "path :: $saveImageToInternalStorage")
                 binding?.ivPlaceImage?.setImageBitmap(thumbNail)
             }
@@ -78,7 +80,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 val selectedImageUri = result.data?.data
                 try {
                     val selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver ,selectedImageUri)
-                    val saveImageToInternalStorage = saveImageToInternalStorage(selectedImageBitmap)
+                    saveImageToInternalStorage = saveImageToInternalStorage(selectedImageBitmap)
                     Log.e("SavedImage" , "path :: $saveImageToInternalStorage")
                     binding?.ivPlaceImage?.setImageBitmap(selectedImageBitmap)
                 }catch (e : IOException){
@@ -90,6 +92,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
         binding?.etDate?.setOnClickListener(this)
         binding?.tvAddImage?.setOnClickListener(this)
+        binding?.btnSave?.setOnClickListener(this)
     }
 
 
@@ -146,6 +149,9 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 pictureDialog.show()
+            }
+            binding?.btnSave ->{
+                // TODO save the dataModel to the database
             }
         }
     }
