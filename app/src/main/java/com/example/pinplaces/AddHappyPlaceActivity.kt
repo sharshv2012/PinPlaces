@@ -4,6 +4,8 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.DatePicker
 import android.widget.Toast
@@ -24,10 +27,14 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
 
 class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private var binding:ActivityAddHappyPlaceBinding? = null
@@ -60,6 +67,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         imageCaptureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val thumbNail: Bitmap = result.data?.extras?.get("data")as Bitmap
+                val saveImageToInternalStorage = saveImageToInternalStorage(thumbNail)
+                Log.e("SavedImage" , "path :: $saveImageToInternalStorage")
                 binding?.ivPlaceImage?.setImageBitmap(thumbNail)
             }
         }
@@ -69,6 +78,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 val selectedImageUri = result.data?.data
                 try {
                     val selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver ,selectedImageUri)
+                    val saveImageToInternalStorage = saveImageToInternalStorage(selectedImageBitmap)
+                    Log.e("SavedImage" , "path :: $saveImageToInternalStorage")
                     binding?.ivPlaceImage?.setImageBitmap(selectedImageBitmap)
                 }catch (e : IOException){
                     e.printStackTrace()
@@ -89,11 +100,11 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Alert")
-        builder.setMessage("this is an alert dialog. which is used to show alert in our app.")
+        builder.setMessage("Do you want to exit?")
         builder.setIcon(android.R.drawable.ic_dialog_alert)
 
-        builder.setPositiveButton("yes") {dialogInterface ,
-                                          which -> finish()
+        builder.setPositiveButton("yes") {dialogInterface , which ->
+            finish()
             dialogInterface.dismiss()
         }
 
@@ -178,7 +189,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 if (report!!.areAllPermissionsGranted()){
                     val galleryIntent = Intent(Intent.ACTION_PICK,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        selectImageLauncher.launch(galleryIntent)
+                    selectImageLauncher.launch(galleryIntent)
 
                 }
             }
@@ -190,6 +201,21 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 showRationalDialogForPermissions()
             }
         }).onSameThread().check()
+    }
+
+    private fun saveImageToInternalStorage (bitmap: Bitmap):Uri{
+        val wrapper = ContextWrapper(applicationContext)
+        var file = wrapper.getDir("HappyPlacesImage" , Context.MODE_PRIVATE)
+        file = File(file , "${UUID.randomUUID()}.jpg")
+        try {
+            val stream : OutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG , 100 , stream)
+            stream.flush()
+            stream.close()
+        }catch (e : IOException){
+            e.printStackTrace()
+        }
+        return Uri.parse(file.absolutePath)
     }
 
     private fun showRationalDialogForPermissions(){
