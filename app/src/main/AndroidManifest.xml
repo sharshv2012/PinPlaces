@@ -17,7 +17,7 @@
         android:theme="@style/Theme.PinPlaces"
         tools:targetApi="31">
         <activity
-            android:name=".activities.AddHappyPlaceActivity"
+            android:name=".activities.AddPinPlaceActivity"
             android:screenOrientation="portrait"
             android:label="Pin Your Place"
             android:theme="@style/CustomNoActionBarTheme"

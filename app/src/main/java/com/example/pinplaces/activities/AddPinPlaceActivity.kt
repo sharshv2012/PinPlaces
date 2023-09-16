@@ -15,13 +15,13 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import com.example.pinplaces.database.DatabaseHandler
 import com.example.pinplaces.databinding.ActivityAddHappyPlaceBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.pinplaces.models.PinPlaceModel
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -36,7 +36,7 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
 
-class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
+class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private var binding:ActivityAddHappyPlaceBinding? = null
     private var cal = Calendar.getInstance()
     private lateinit var dateSetListener: OnDateSetListener
@@ -65,7 +65,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             cal.set(Calendar.DAY_OF_MONTH , dayOfMonth)
             updateDateInView()
         }
-
+        updateDateInView() // To automatically update the date
         imageCaptureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val thumbNail: Bitmap = result.data?.extras?.get("data")as Bitmap
@@ -127,7 +127,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v!!){
             binding?.etDate ->{
-                DatePickerDialog(this@AddHappyPlaceActivity ,
+                DatePickerDialog(this@AddPinPlaceActivity ,
                     dateSetListener ,
                     cal.get(Calendar.YEAR) ,
                     cal.get(Calendar.MONTH) ,
@@ -151,7 +151,36 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 pictureDialog.show()
             }
             binding?.btnSave ->{
-                // TODO save the dataModel to the database
+                when{
+                    binding?.etTitle?.text.isNullOrEmpty() ->{
+                        Toast.makeText(this@AddPinPlaceActivity , "Please Enter Title" ,Toast.LENGTH_LONG).show()
+                    }
+                    binding?.etDescription?.text.isNullOrEmpty() ->{
+                        Toast.makeText(this@AddPinPlaceActivity , "Please Enter Description" ,Toast.LENGTH_LONG).show()
+                    }
+                    binding?.etLocation?.text.isNullOrEmpty() ->{
+                        Toast.makeText(this@AddPinPlaceActivity , "Please Enter Location" ,Toast.LENGTH_LONG).show()
+                    }
+                    saveImageToInternalStorage == null -> {
+                        Toast.makeText(this@AddPinPlaceActivity , "Please Select or Capture An Image" ,Toast.LENGTH_LONG).show()
+                    }
+                    else ->{
+                        val pinPlaceModel = PinPlaceModel( 0,
+                        binding?.etTitle?.text.toString(),
+                        saveImageToInternalStorage.toString(),
+                        binding?.etDescription?.text.toString(),
+                        binding?.etDate?.text.toString(),
+                        binding?.etLocation?.text.toString(),
+                        mLatitude,
+                        mLongitude)
+                        val dbHandler = DatabaseHandler(this)
+                        val addPinPlace = dbHandler.addPinPlace(pinPlaceModel)
+                        if(addPinPlace > 0){
+                            Toast.makeText(this@AddPinPlaceActivity , "Details Are Inserted Successfully" ,Toast.LENGTH_LONG).show()
+                            finish()
+                        }
+                    }
+                }
             }
         }
     }
@@ -160,7 +189,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private fun takePhotoFromCamera(){
 
 
-        Dexter.withContext(this@AddHappyPlaceActivity).withPermissions(
+        Dexter.withContext(this@AddPinPlaceActivity).withPermissions(
             android.Manifest.permission.READ_EXTERNAL_STORAGE ,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE ,
             android.Manifest.permission.CAMERA,
@@ -184,7 +213,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     }
     private fun choosePhotoFromGallery(){
 
-        Dexter.withContext(this@AddHappyPlaceActivity).withPermissions(
+        Dexter.withContext(this@AddPinPlaceActivity).withPermissions(
             android.Manifest.permission.READ_EXTERNAL_STORAGE ,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE ,
             android.Manifest.permission.CAMERA,
