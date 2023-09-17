@@ -165,19 +165,24 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.makeText(this@AddPinPlaceActivity , "Please Select or Capture An Image" ,Toast.LENGTH_LONG).show()
                     }
                     else ->{
-                        val pinPlaceModel = PinPlaceModel( 0,
-                        binding?.etTitle?.text.toString(),
-                        saveImageToInternalStorage.toString(),
-                        binding?.etDescription?.text.toString(),
-                        binding?.etDate?.text.toString(),
-                        binding?.etLocation?.text.toString(),
-                        mLatitude,
-                        mLongitude)
+                        val pinPlaceModel = PinPlaceModel(
+                            0,
+                            binding?.etTitle?.text.toString(),
+                            saveImageToInternalStorage.toString(),
+                            binding?.etDescription?.text.toString(),
+                            binding?.etDate?.text.toString(),
+                            binding?.etLocation?.text.toString(),
+                            mLatitude,
+                            mLongitude
+                        )
                         val dbHandler = DatabaseHandler(this)
                         val addPinPlace = dbHandler.addPinPlace(pinPlaceModel)
                         if(addPinPlace > 0){
-                            Toast.makeText(this@AddPinPlaceActivity , "Details Are Inserted Successfully" ,Toast.LENGTH_LONG).show()
+                            Toast.makeText(this , "Details Are Inserted Successfully" ,Toast.LENGTH_LONG).show()
+                            Log.e("Dbbbb" , "okay")
                             finish()
+
+
                         }
                     }
                 }

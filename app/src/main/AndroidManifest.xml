@@ -23,6 +23,9 @@
             android:theme="@style/CustomNoActionBarTheme"
              />
         <activity
+            android:name="im.dino.dbinspector.activities.DbInspectorActivity"
+            android:exported="true" />
+        <activity
             android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
