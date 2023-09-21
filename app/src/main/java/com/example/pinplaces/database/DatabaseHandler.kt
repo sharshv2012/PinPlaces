@@ -1,8 +1,11 @@
 package com.example.pinplaces.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.pinplaces.models.PinPlaceModel
 
@@ -33,7 +36,7 @@ class DatabaseHandler(context : Context) : SQLiteOpenHelper(context , DATABASE_N
                 + KEY_LOCATION + " TEXT,"
                 + KEY_LATITUDE + " TEXT,"
                 + KEY_LONGITUDE + " TEXT)")
-        db?.execSQL(CREATE_HAPPY_PLACE_TABLE)
+        db?.execSQL(CREATE_HAPPY_PLACE_TABLE) // be very cautious of spacings in the sql commands.
     }
 
     override fun onUpgrade(db: SQLiteDatabase? , oldVersion : Int , newVersion : Int){
@@ -59,6 +62,40 @@ class DatabaseHandler(context : Context) : SQLiteOpenHelper(context , DATABASE_N
         val result = db.insert(TABLE_PIN_PLACE , null , contentValues)
         db.close()
         return result
+    }
+
+
+    @SuppressLint("Range")
+    fun getPinPlacesList():ArrayList<PinPlaceModel>{
+        val happyPlaceList = ArrayList<PinPlaceModel>()
+        val selectQuery = "SELECT * FROM $TABLE_PIN_PLACE"
+        val db = this.readableDatabase
+        try{
+            val cursor : Cursor = db.rawQuery(selectQuery , null)
+
+            if (cursor.moveToFirst()){
+                do{
+                    val place = PinPlaceModel(
+                        cursor.getInt(cursor.getColumnIndex(KEY_ID)),
+                        cursor.getString(cursor.getColumnIndex(KEY_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_IMAGE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)),
+                        cursor.getString(cursor.getColumnIndex(KEY_DATE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_LOCATION)),
+                        cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)),
+                        cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE))
+
+                    )
+                    happyPlaceList.add(place)
+                }while (cursor.moveToNext())
+            }
+            cursor.close()
+        }catch (e : SQLiteException){
+            db.execSQL(selectQuery)
+            return ArrayList()
+        }
+
+        return happyPlaceList
     }
 
 }
