@@ -57,6 +57,9 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
             alertDialogFunction()
         }
 
+
+
+
         dateSetListener = OnDateSetListener {
                 view, year, month, dayOfMonth ->
 
@@ -179,7 +182,7 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         val addPinPlace = dbHandler.addPinPlace(pinPlaceModel)
                         if(addPinPlace > 0){
                             Toast.makeText(this , "Details Are Inserted Successfully" ,Toast.LENGTH_LONG).show()
-                            Log.e("Dbbbb" , "okay")
+                            setResult(Activity.RESULT_OK)
                             finish()
 
 
@@ -247,6 +250,7 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
         val wrapper = ContextWrapper(applicationContext)
         var file = wrapper.getDir("HappyPlacesImage" , Context.MODE_PRIVATE)
         file = File(file , "${UUID.randomUUID()}.jpg")
+
         try {
             val stream : OutputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.JPEG , 100 , stream)
