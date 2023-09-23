@@ -1,9 +1,12 @@
 package com.example.pinplaces.adapters
 
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pinplaces.databinding.ItemPinPlaceBinding
@@ -15,7 +18,7 @@ open class PinPlacesAdapter (
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
 
-
+    private var onClickListener : OnClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemPinPlaceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -33,8 +36,20 @@ open class PinPlacesAdapter (
             holder.binding.ivPlaceImage.setImageURI(Uri.parse(model.image))
             holder.binding.tvTitle.text = model.title
             holder.binding.tvDescription.text = model.description
+            holder.itemView.setOnClickListener {
+                if(onClickListener != null){
+                    onClickListener!!.onClick(position, model)
+                }
+            }
         }
 
+    }
+    fun setOnClickListener(onClickListener: OnClickListener){ // we did all this because an adapter can't have it's own onclick listener.
+        this.onClickListener = onClickListener
+    }
+
+    interface OnClickListener {
+        fun onClick(position: Int , model: PinPlaceModel)
     }
 
     private class MyViewHolder(val binding: ItemPinPlaceBinding) : RecyclerView.ViewHolder(binding.root)

@@ -46,6 +46,12 @@ class MainActivity : AppCompatActivity() {
         binding?.rvPinPlacesList?.setHasFixedSize(true)
         val placesAdapter = PinPlacesAdapter( pinPlacesList)
         binding?.rvPinPlacesList?.adapter = placesAdapter
+        placesAdapter.setOnClickListener(object : PinPlacesAdapter.OnClickListener{
+            override fun onClick(position: Int, model: PinPlaceModel) {
+                val intent = Intent(this@MainActivity , PinPlaceDetailActivity::class.java)
+                startActivity(intent)
+            }
+        })
     }
     private fun getPinPlaceListFromLocalDB(){
         val dbHandler = DatabaseHandler(this)
