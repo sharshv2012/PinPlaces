@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         placesAdapter.setOnClickListener(object : PinPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: PinPlaceModel) {
                 val intent = Intent(this@MainActivity , PinPlaceDetailActivity::class.java)
+                intent.putExtra(EXTRA_PLACE_DETAILS, model)
+
                 startActivity(intent)
             }
         })
@@ -67,5 +69,8 @@ class MainActivity : AppCompatActivity() {
             binding?.rvPinPlacesList?.visibility = View.GONE
             binding?.tvNoRcrdsAvailble?.visibility = View.VISIBLE
         }
+    }
+    companion object{
+        var EXTRA_PLACE_DETAILS = "extra_place_details"
     }
 }

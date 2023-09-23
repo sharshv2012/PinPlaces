@@ -35,8 +35,9 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_place_image"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/detail_screen_image_height_size"
+                android:layout_width="wrap_content"
+                android:padding="15dp"
+                android:layout_height="300dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/detail_screen_image_placeholder"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -50,7 +51,11 @@
                 android:layout_marginStart="@dimen/detail_screen_description_margin"
                 android:layout_marginTop="@dimen/detail_screen_description_margin"
                 android:layout_marginEnd="@dimen/detail_screen_description_margin"
-                android:textColor="@color/black"
+                android:textColor="@color/cyan400"
+                android:gravity="center"
+                android:textStyle="italic"
+
+                android:layout_margin="20dp"
                 android:textSize="@dimen/detail_screen_description_text_size"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.533"
@@ -59,6 +64,7 @@
                 tools:text="Description" />
 
             <TextView
+                android:layout_margin="20dp"
                 android:id="@+id/tv_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,6 +74,7 @@
                 android:textColor="@color/pink200"
                 android:textSize="@dimen/detail_screen_location_text_size"
                 android:textStyle="bold"
+                android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.533"
                 app:layout_constraintStart_toStartOf="parent"
