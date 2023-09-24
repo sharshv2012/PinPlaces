@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import com.example.pinplaces.adapters.PinPlacesAdapter
 import com.example.pinplaces.database.DatabaseHandler
 import com.example.pinplaces.databinding.ActivityAddHappyPlaceBinding
 import com.example.pinplaces.models.PinPlaceModel
@@ -107,6 +108,8 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
             binding?.ivPlaceImage?.setImageURI(saveImageToInternalStorage)
             binding?.btnSave?.text = "UPDATE"
+
+
         }
 
         binding?.etDate?.setOnClickListener(this)
@@ -185,8 +188,7 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     else ->{
                         val pinPlaceModel = PinPlaceModel(
-                            0,
-                            binding?.etTitle?.text.toString(),
+                            if (mPinPlaceDetails == null) 0 else mPinPlaceDetails!!.id ,                          binding?.etTitle?.text.toString(),
                             saveImageToInternalStorage.toString(),
                             binding?.etDescription?.text.toString(),
                             binding?.etDate?.text.toString(),
@@ -195,13 +197,20 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
                             mLongitude
                         )
                         val dbHandler = DatabaseHandler(this)
-                        val addPinPlace = dbHandler.addPinPlace(pinPlaceModel)
-                        if(addPinPlace > 0){
+                        if(mPinPlaceDetails == null){
+                            val addPinPlace = dbHandler.addPinPlace(pinPlaceModel)
                             Toast.makeText(this , "Details Are Inserted Successfully" ,Toast.LENGTH_LONG).show()
-                            setResult(Activity.RESULT_OK)
-                            finish()
-
-
+                            if(addPinPlace > 0){
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                        }else{
+                            val updatePinPlace = dbHandler.updatePinPlace(pinPlaceModel)
+                            Toast.makeText(this , "Details Updated Successfully" ,Toast.LENGTH_LONG).show()
+                            if(updatePinPlace > 0){
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
                         }
                     }
                 }

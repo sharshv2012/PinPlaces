@@ -64,6 +64,26 @@ class DatabaseHandler(context : Context) : SQLiteOpenHelper(context , DATABASE_N
         return result
     }
 
+    fun updatePinPlace(pinPlace : PinPlaceModel): Int {
+        val db = this.writableDatabase
+
+        val contentValues = ContentValues()
+        contentValues.put(KEY_TITLE, pinPlace.title) // HappyPlaceModelClass TITLE
+        contentValues.put(KEY_IMAGE, pinPlace.image) // HappyPlaceModelClass IMAGE
+        contentValues.put(
+            KEY_DESCRIPTION,
+            pinPlace.description
+        ) // HappyPlaceModelClass DESCRIPTION
+        contentValues.put(KEY_DATE, pinPlace.date) // HappyPlaceModelClass DATE
+        contentValues.put(KEY_LOCATION, pinPlace.location) // HappyPlaceModelClass LOCATION
+        contentValues.put(KEY_LATITUDE, pinPlace.latitude) // HappyPlaceModelClass LATITUDE
+        contentValues.put(KEY_LONGITUDE, pinPlace.longitude) // HappyPlaceModelClass LONGITUDE
+
+        val success = db.update(TABLE_PIN_PLACE, contentValues, KEY_ID + "=" + pinPlace.id, null )
+        db.close()
+        return success
+    }
+
 
     @SuppressLint("Range")
     fun getPinPlacesList():ArrayList<PinPlaceModel>{
