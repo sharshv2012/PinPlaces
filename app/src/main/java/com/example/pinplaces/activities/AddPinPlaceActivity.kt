@@ -46,7 +46,7 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private var mLatitude : Double = 0.0
     private var mLongitude : Double = 0.0
 
-
+    private var mPinPlaceDetails : PinPlaceModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddHappyPlaceBinding.inflate(layoutInflater)
@@ -57,7 +57,9 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
             alertDialogFunction()
         }
 
-
+        if(intent.hasExtra(MainActivity.EXTRA_PLACE_DETAILS)){
+            mPinPlaceDetails = intent.getParcelableExtra(MainActivity.EXTRA_PLACE_DETAILS)
+        }
 
 
         dateSetListener = OnDateSetListener {
@@ -91,6 +93,20 @@ class AddPinPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this , "Something Went Wrong!" , Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+        if (mPinPlaceDetails != null){
+            supportActionBar?.title = "Edit Your PinnedPlace"
+            binding?.etTitle?.setText(mPinPlaceDetails!!.title)
+            binding?.etDescription?.setText(mPinPlaceDetails!!.description)
+            binding?.etDate?.setText(mPinPlaceDetails!!.date)
+            binding?.etLocation?.setText(mPinPlaceDetails!!.location)
+            mLatitude = mPinPlaceDetails!!.latitude
+            mLongitude = mPinPlaceDetails!!.longitude
+
+            saveImageToInternalStorage = Uri.parse(mPinPlaceDetails!!.image)
+
+            binding?.ivPlaceImage?.setImageURI(saveImageToInternalStorage)
+            binding?.btnSave?.text = "UPDATE"
         }
 
         binding?.etDate?.setOnClickListener(this)

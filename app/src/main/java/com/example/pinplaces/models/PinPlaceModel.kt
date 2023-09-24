@@ -13,7 +13,7 @@ data class PinPlaceModel (
     val location : String?,
     val latitude : Double,
     val longitude : Double
-): Parcelable {
+): Parcelable { // we can also use .serializable but it's a bit slow
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),
