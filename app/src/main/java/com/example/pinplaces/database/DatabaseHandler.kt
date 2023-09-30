@@ -84,6 +84,13 @@ class DatabaseHandler(context : Context) : SQLiteOpenHelper(context , DATABASE_N
         return success
     }
 
+    fun deletePinPlace(pinPlace: PinPlaceModel):Int{
+        val db = this.writableDatabase
+        val success = db.delete(TABLE_PIN_PLACE, KEY_ID + "=" + pinPlace.id , null)
+        db.close()
+        return success
+    }
+
 
     @SuppressLint("Range")
     fun getPinPlacesList():ArrayList<PinPlaceModel>{

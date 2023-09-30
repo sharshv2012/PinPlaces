@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pinplaces.R
 
- // imported this code from https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6
-abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
-    private val editIcon = ContextCompat.getDrawable(context, R.drawable.ic_edit_24)
-    private val intrinsicWidth = editIcon?.intrinsicWidth
-    private val intrinsicHeight = editIcon?.intrinsicHeight
+abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_white_24)
+    private val intrinsicWidth = deleteIcon?.intrinsicWidth
+    private val intrinsicHeight = deleteIcon?.intrinsicHeight
     private val background = ColorDrawable()
-    private val backgroundColor = Color.parseColor("#70e000")
+    private val backgroundColor = Color.parseColor("#f44336")
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
 
@@ -34,18 +34,13 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
         return super.getMovementFlags(recyclerView, viewHolder)
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(recyclerView: RecyclerView , viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         return false
     }
 
     override fun onChildDraw(
-        c: Canvas,
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
-        dX: Float,
-        dY: Float,
-        actionState: Int,
-        isCurrentlyActive: Boolean
+        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+        dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
     ) {
 
         val itemView = viewHolder.itemView
@@ -58,21 +53,21 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
             return
         }
 
-        // Draw the green edit background
+        // Draw the red delete background
         background.color = backgroundColor
-        background.setBounds(itemView.left + dX.toInt(), itemView.top, itemView.left, itemView.bottom)
+        background.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
         background.draw(c)
 
-        // Calculate position of edit icon
-        val editIconTop = itemView.top + (itemHeight - intrinsicHeight!!) / 2
-        val editIconMargin = (itemHeight - intrinsicHeight!!) / 2
-        val editIconLeft = itemView.left + editIconMargin!!
-        val editIconRight = editIconLeft + intrinsicWidth!!
-        val editIconBottom = editIconTop + intrinsicHeight!!
+        // Calculate position of delete icon
+        val deleteIconTop = itemView.top + (itemHeight - intrinsicHeight!!) / 2
+        val deleteIconMargin = (itemHeight - intrinsicHeight) / 2
+        val deleteIconLeft = itemView.right - deleteIconMargin - intrinsicWidth!!
+        val deleteIconRight = itemView.right - deleteIconMargin
+        val deleteIconBottom = deleteIconTop + intrinsicHeight
 
-        // Draw the edit icon
-        editIcon?.setBounds(editIconLeft, editIconTop, editIconRight, editIconBottom)
-        editIcon?.draw(c)
+        // Draw the delete icon
+        deleteIcon?.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+        deleteIcon?.draw(c)
 
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }

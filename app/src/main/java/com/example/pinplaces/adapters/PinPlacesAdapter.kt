@@ -1,6 +1,7 @@
 package com.example.pinplaces.adapters
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pinplaces.activities.AddPinPlaceActivity
 import com.example.pinplaces.activities.MainActivity
+import com.example.pinplaces.database.DatabaseHandler
 import com.example.pinplaces.databinding.ItemPinPlaceBinding
 import com.example.pinplaces.models.PinPlaceModel
 
@@ -51,7 +53,14 @@ open class PinPlacesAdapter (
         notifyItemChanged(position)
     }
 
-
+    fun removeAt(position: Int , context: Context){
+        val dbHandler = DatabaseHandler(context)
+        val isDeleted = dbHandler.deletePinPlace(list[position])
+        if (isDeleted > 0 ){
+            list.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
 
     fun setOnClickListener(onClickListener: OnClickListener){ // we did all this because an adapter can't have it's own onclick listener.
         this.onClickListener = onClickListener

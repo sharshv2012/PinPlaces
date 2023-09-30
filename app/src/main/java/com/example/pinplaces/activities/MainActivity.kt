@@ -15,6 +15,7 @@ import com.example.pinplaces.adapters.PinPlacesAdapter
 import com.example.pinplaces.database.DatabaseHandler
 import com.example.pinplaces.databinding.ActivityMainBinding
 import com.example.pinplaces.models.PinPlaceModel
+import com.example.pinplaces.utils.SwipeToDeleteCallback
 import com.example.pinplaces.utils.SwipeToEditCallback
 
 class MainActivity : AppCompatActivity() {
@@ -62,11 +63,25 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = binding?.rvPinPlacesList?.adapter as PinPlacesAdapter
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, ADD_PLACE_ACTIVITY_REQUEST_CODE)
+                getPinPlaceListFromLocalDB()
             }
         }
 
         val editItemTouchHelper = ItemTouchHelper(editSwipeHandler)
         editItemTouchHelper.attachToRecyclerView(binding?.rvPinPlacesList)
+
+        val deleteSwipeHandler = object  : SwipeToDeleteCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = binding?.rvPinPlacesList?.adapter as PinPlacesAdapter
+                adapter.removeAt(viewHolder.adapterPosition , this@MainActivity)
+
+                getPinPlaceListFromLocalDB()
+            }
+        }
+
+        val deleteItemTouchHelper = ItemTouchHelper(deleteSwipeHandler)
+        deleteItemTouchHelper.attachToRecyclerView(binding?.rvPinPlacesList)
+
     }
     private fun getPinPlaceListFromLocalDB(){
         val dbHandler = DatabaseHandler(this)
